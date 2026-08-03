@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 노래책</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#C1432B" id="themeColorMeta">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="노래책">
 <style>
   :root{
     --paper:#FFFFFF;
@@ -13,6 +19,8 @@
     --line:rgba(43,33,26,0.16);
     --accent:#C1432B;
     --accent-ink:#FFF8EE;
+    --btn-primary-bg:#C1432B;
+    --btn-primary-ink:#FFF8EE;
     --tab-kpop:#D1527C;
     --tab-jpop:#3B7D8C;
     --tab-pop:#C79A3B;
@@ -29,6 +37,8 @@
       --line:rgba(200,193,230,0.14);
       --accent:#ED7052;
       --accent-ink:#180F2A;
+      --btn-primary-bg:#7A3B2A;
+      --btn-primary-ink:#F3E9E2;
       --tab-kpop:#EE8FB2;
       --tab-jpop:#6FC7DB;
       --tab-pop:#EFC475;
@@ -45,6 +55,8 @@
     --line:rgba(200,193,230,0.14);
     --accent:#ED7052;
     --accent-ink:#180F2A;
+    --btn-primary-bg:#7A3B2A;
+    --btn-primary-ink:#F3E9E2;
     --tab-kpop:#EE8FB2;
     --tab-jpop:#6FC7DB;
     --tab-pop:#EFC475;
@@ -60,6 +72,8 @@
     --line:rgba(43,33,26,0.16);
     --accent:#C1432B;
     --accent-ink:#FFF8EE;
+    --btn-primary-bg:#C1432B;
+    --btn-primary-ink:#FFF8EE;
     --tab-kpop:#D1527C;
     --tab-jpop:#3B7D8C;
     --tab-pop:#C79A3B;
@@ -133,7 +147,7 @@
   }
   .btn:active{transform:translateY(1px);}
   .btn:disabled{opacity:.6;cursor:default;}
-  .btn-primary{background:var(--accent);color:var(--accent-ink);}
+  .btn-primary{background:var(--btn-primary-bg);color:var(--btn-primary-ink);}
   .btn-primary:hover{filter:brightness(1.08);}
   .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
   .btn-ghost:hover{background:var(--hover);}
@@ -815,7 +829,10 @@
     return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
   }
   function paintThemeToggle(){
-    themeToggle.innerHTML = effectiveTheme() === "dark" ? sunSvg : moonSvg;
+    var isDark = effectiveTheme() === "dark";
+    themeToggle.innerHTML = isDark ? sunSvg : moonSvg;
+    var metaTheme = document.getElementById("themeColorMeta");
+    if(metaTheme) metaTheme.setAttribute("content", isDark ? "#7A3B2A" : "#C1432B");
   }
   try{
     var storedTheme = localStorage.getItem(THEME_KEY);
@@ -1467,6 +1484,12 @@
   }).catch(function(){
     document.getElementById("grid").innerHTML = '<div class="empty">노래 목록을 불러오지 못했어요. 새로고침해보세요.</div>';
   });
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("/sw.js").catch(function(){});
+    });
+  }
 })();
 </script>
 </body>
