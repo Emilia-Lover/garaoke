@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
 
   try {
     if (req.method === "GET") {
-      const r = await sb("songs?select=*&order=created_at.asc");
+      const r = await sb("songs?select=*&order=created_at.asc,id.asc");
       const rows = await r.json();
       if (!r.ok) { res.status(r.status).json(rows); return; }
       res.status(200).json(rows.map(fromRow));

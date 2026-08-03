@@ -402,6 +402,7 @@
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
   .req{color:var(--accent);}
+  .pw-error{color:var(--accent);font-size:12.5px;margin:-6px 0 4px;font-weight:600;}
 
   .image-field{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
   .image-preview{
@@ -484,6 +485,28 @@
 
   <footer>TJ/금영 번호는 조사 시점 기준이며 매장·업데이트에 따라 다를 수 있어요. 노래 추가·수정·삭제는 공유 비밀번호가 필요하고, 저장하면 모두에게 보여요. 내 목록(폴더)은 이 브라우저에만 저장돼요.</footer>
 </div>
+
+<!-- shared edit password dialog -->
+<dialog id="pwDlg">
+  <div class="dlg-body">
+    <button class="dlg-close" id="pwClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <form id="pwForm">
+      <h2>비밀번호 확인</h2>
+      <p class="pick-song-name" style="margin-top:-6px;">노래를 추가·수정·삭제하려면 공유 비밀번호가 필요해요.</p>
+      <div class="field">
+        <label for="pwInput">비밀번호</label>
+        <input type="password" id="pwInput" autocomplete="off" required>
+      </div>
+      <p class="pw-error" id="pwError" hidden>비밀번호가 올바르지 않아요. 다시 입력해주세요.</p>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="pwCancel">취소</button>
+        <button type="submit" class="btn btn-primary">확인</button>
+      </div>
+    </form>
+  </div>
+</dialog>
 
 <!-- detail dialog -->
 <dialog id="detailDlg">
@@ -679,7 +702,37 @@
   function getSavedPassword(){ try{ return localStorage.getItem(EDIT_PW_KEY) || ""; }catch(e){ return ""; } }
   function setSavedPassword(pw){ try{ localStorage.setItem(EDIT_PW_KEY, pw); }catch(e){} }
 
-  function apiRequest(method, body, isRetry){
+  // ---- shared edit password dialog (theme-aware, replaces window.prompt) ----
+  var pwDlg = document.getElementById("pwDlg");
+  var pwForm = document.getElementById("pwForm");
+  var pwInput = document.getElementById("pwInput");
+  var pwError = document.getElementById("pwError");
+  var pwResolve = null;
+
+  function askPassword(showError){
+    return new Promise(function(resolve){
+      pwResolve = resolve;
+      pwInput.value = "";
+      pwError.hidden = !showError;
+      pwDlg.showModal();
+      setTimeout(function(){ pwInput.focus(); }, 0);
+    });
+  }
+  pwForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    pwDlg.dataset.submitted = "1";
+    pwDlg.close();
+  });
+  document.getElementById("pwCancel").addEventListener("click", function(){ pwDlg.close(); });
+  document.getElementById("pwClose").addEventListener("click", function(){ pwDlg.close(); });
+  pwDlg.addEventListener("close", function(){
+    var wasSubmitted = pwDlg.dataset.submitted === "1";
+    pwDlg.dataset.submitted = "";
+    var val = wasSubmitted ? pwInput.value : null;
+    if(pwResolve){ var r = pwResolve; pwResolve = null; r(val); }
+  });
+
+  function apiRequest(method, body, wrongPasswordSoFar){
     var pw = getSavedPassword();
     var payload = Object.assign({}, body || {}, {password: pw});
     return fetch("/api/songs", {
@@ -687,11 +740,12 @@
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     }).then(function(res){
-      if(res.status === 401 && !isRetry){
-        var entered = window.prompt("공유 비밀번호를 입력하세요");
-        if(entered === null){ var e = new Error("cancelled"); e.cancelled = true; throw e; }
-        setSavedPassword(entered);
-        return apiRequest(method, body, true);
+      if(res.status === 401){
+        return askPassword(!!wrongPasswordSoFar).then(function(entered){
+          if(entered === null || entered === ""){ var e = new Error("cancelled"); e.cancelled = true; throw e; }
+          setSavedPassword(entered);
+          return apiRequest(method, body, true);
+        });
       }
       return res.json().catch(function(){ return {}; }).then(function(data){
         if(!res.ok){ throw new Error(data.error || ("요청 실패 (" + res.status + ")")); }
