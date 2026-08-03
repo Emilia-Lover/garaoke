@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 노래책</title>
+<style>
+  :root{
+    --paper:#FFFFFF;
+    --paper-raised:#FFFFFF;
+    --ink:#2B211A;
+    --ink-soft:#6B5C4C;
+    --line:rgba(43,33,26,0.16);
+    --accent:#C1432B;
+    --accent-ink:#FFF8EE;
+    --tab-kpop:#D1527C;
+    --tab-jpop:#3B7D8C;
+    --tab-pop:#C79A3B;
+    --shadow: 0 1px 2px rgba(43,33,26,0.06), 0 6px 20px rgba(43,33,26,0.08);
+    --hover: rgba(43,33,26,0.05);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#0F0C1E;
+      --paper-raised:#1B1730;
+      --ink:#ECE9F7;
+      --ink-soft:#9C93BE;
+      --line:rgba(200,193,230,0.14);
+      --accent:#ED7052;
+      --accent-ink:#180F2A;
+      --tab-kpop:#EE8FB2;
+      --tab-jpop:#6FC7DB;
+      --tab-pop:#EFC475;
+      --shadow: 0 1px 2px rgba(0,0,0,0.45), 0 12px 34px rgba(0,0,0,0.6);
+      --hover: rgba(200,193,230,0.09);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0F0C1E;
+    --paper-raised:#1B1730;
+    --ink:#ECE9F7;
+    --ink-soft:#9C93BE;
+    --line:rgba(200,193,230,0.14);
+    --accent:#ED7052;
+    --accent-ink:#180F2A;
+    --tab-kpop:#EE8FB2;
+    --tab-jpop:#6FC7DB;
+    --tab-pop:#EFC475;
+    --shadow: 0 1px 2px rgba(0,0,0,0.45), 0 12px 34px rgba(0,0,0,0.6);
+    --hover: rgba(200,193,230,0.09);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"]{
+    --paper:#FFFFFF;
+    --paper-raised:#FFFFFF;
+    --ink:#2B211A;
+    --ink-soft:#6B5C4C;
+    --line:rgba(43,33,26,0.16);
+    --accent:#C1432B;
+    --accent-ink:#FFF8EE;
+    --tab-kpop:#D1527C;
+    --tab-jpop:#3B7D8C;
+    --tab-pop:#C79A3B;
+    --hover: rgba(43,33,26,0.05);
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Pretendard Variable","Pretendard","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Malgun Gothic",sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{
+    font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Roboto Mono",monospace;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px;}
+
+  /* header */
+  header{margin-bottom:22px;}
+  .title-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  h1{
+    font-size:clamp(26px,4vw,34px);
+    font-weight:800;
+    letter-spacing:-0.02em;
+    margin:0;
+    text-wrap:balance;
+  }
+  .subtitle{
+    margin:4px 0 0;
+    font-size:13px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+
+  .toolbar{
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .search-box{
+    flex:1 1 220px;
+    position:relative;
+  }
+  .search-box input{
+    width:100%;
+    padding:10px 14px 10px 36px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--ink);
+    font-size:14px;
+    font-family:inherit;
+  }
+  .search-box input:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .search-box svg{
+    position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;color:var(--ink-soft);
+  }
+  .btn{
+    appearance:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:14px;font-weight:600;
+    padding:10px 16px;border-radius:10px;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:transform .12s ease, filter .12s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.6;cursor:default;}
+  .btn-primary{background:var(--accent);color:var(--accent-ink);}
+  .btn-primary:hover{filter:brightness(1.08);}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  .btn-ghost:hover{background:var(--hover);}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .tabs-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:18px;}
+  .header-actions{display:flex;align-items:center;gap:8px;flex:none;}
+  .icon-btn{
+    appearance:none;cursor:pointer;font-family:inherit;
+    background:transparent;color:var(--ink);border:1px solid var(--line);
+    width:38px;height:38px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;flex:none;
+    transition:background .12s ease;
+  }
+  .icon-btn:hover{background:var(--hover);}
+  .icon-btn svg{width:17px;height:17px;display:block;}
+  .icon-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* genre tabs - binder-index style */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;}
+  .tab{
+    appearance:none;cursor:pointer;font-family:inherit;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--ink-soft);
+    font-size:13px;font-weight:700;
+    padding:9px 14px 8px;
+    border-radius:9px 9px 3px 3px;
+    position:relative;
+    top:0;
+    transition:top .12s ease, color .12s ease, box-shadow .12s ease;
+  }
+  .tab .count{font-family:inherit;opacity:.7;font-weight:600;margin-left:4px;}
+  .tab[aria-selected="true"]{
+    color:var(--ink);
+    top:-3px;
+    box-shadow:var(--shadow);
+    border-bottom-color:transparent;
+  }
+  .tab[data-filter="kpop"][aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--tab-kpop), var(--shadow);}
+  .tab[data-filter="jpop"][aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--tab-jpop), var(--shadow);}
+  .tab[data-filter="pop"][aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--tab-pop), var(--shadow);}
+  .tab[data-filter="fav"][aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--accent), var(--shadow);}
+  .tab[data-filter="all"][aria-selected="true"]{box-shadow:inset 0 -3px 0 var(--ink-soft), var(--shadow);}
+
+  /* playlist header */
+  .playlist-header{
+    display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+    margin:22px 2px 10px;flex-wrap:wrap;
+  }
+  .playlist-header h2{font-size:16px;font-weight:800;margin:0;letter-spacing:-0.01em;}
+  .playlist-header p{font-size:12px;color:var(--ink-soft);margin:0;}
+  .back-btn{
+    appearance:none;cursor:pointer;font-family:inherit;
+    background:transparent;border:none;color:var(--ink-soft);
+    display:flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;
+    padding:0;margin:0 0 4px;
+  }
+  .back-btn:hover{color:var(--ink);}
+  .back-btn svg{width:14px;height:14px;}
+  .folder-row{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    cursor:pointer;
+    text-align:left;
+    font-family:inherit;
+    color:var(--ink);
+    display:flex;align-items:center;gap:12px;
+    box-shadow:var(--shadow);
+    width:100%;
+  }
+  .folder-row:hover{transform:translateY(-1px);}
+  .folder-icon{
+    flex:none;width:38px;height:38px;border-radius:9px;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--accent);
+  }
+  .folder-icon svg{width:18px;height:18px;}
+  .folder-icon-img{
+    flex:none;width:38px;height:38px;border-radius:9px;
+    object-fit:cover;border:1px solid var(--line);
+  }
+  .folder-info{flex:1;min-width:0;}
+  .folder-name{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .folder-count{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .folder-settings,.folder-delete{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    color:var(--ink-soft);padding:4px;flex:none;line-height:0;
+  }
+  .folder-settings:hover{color:var(--ink);}
+  .folder-delete:hover{color:var(--accent);}
+  .folder-settings svg,.folder-delete svg{width:16px;height:16px;display:block;}
+
+  /* list */
+  .grid{
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .empty{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:9px 14px;
+    cursor:pointer;
+    text-align:left;
+    font-family:inherit;
+    color:var(--ink);
+    display:flex;align-items:center;gap:12px;
+    box-shadow:var(--shadow);
+    position:relative;
+    border-left:4px solid var(--genre-color, var(--line));
+    width:100%;
+  }
+  .card:hover{transform:translateY(-1px);}
+  .card[draggable="true"]{cursor:default;}
+  .card.drag-over{outline:2px dashed var(--accent);outline-offset:-2px;}
+  .drag-handle{
+    flex:none;color:var(--ink-soft);opacity:.55;cursor:grab;
+    display:flex;align-items:center;touch-action:none;
+  }
+  .drag-handle:active{cursor:grabbing;}
+  .drag-handle svg{width:16px;height:16px;display:block;}
+  .play-num{
+    flex:none;width:18px;text-align:center;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .card-art{
+    flex:none;width:48px;height:48px;border-radius:9px;
+    object-fit:cover;background:var(--paper);
+    border:1px solid var(--line);
+  }
+  .card-art-placeholder{
+    flex:none;width:48px;height:48px;border-radius:9px;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--genre-color,var(--ink-soft));opacity:.55;
+  }
+  .card-art-placeholder svg{width:20px;height:20px;}
+  .card-info{flex:1;min-width:0;}
+  .card-title{
+    font-size:14.5px;font-weight:700;line-height:1.3;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .card-artist{
+    font-size:12.5px;color:var(--ink-soft);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .fav-btn{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    padding:2px;flex:none;line-height:0;
+    color:var(--ink-soft);
+  }
+  .fav-btn svg{width:19px;height:19px;display:block;}
+  .fav-btn[aria-pressed="true"]{color:var(--accent);}
+  .badges{display:flex;gap:6px;flex:none;}
+  .badge{
+    font-size:11px;
+    padding:3px 7px;
+    border-radius:6px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    letter-spacing:0.02em;
+    white-space:nowrap;
+  }
+  .badge b{color:var(--ink);font-weight:700;}
+  @media (max-width:560px){
+    .badges{display:none;}
+  }
+
+  /* dialogs */
+  dialog{
+    border:none;border-radius:16px;padding:0;
+    background:var(--paper-raised);color:var(--ink);
+    width:min(560px,92vw);
+    box-shadow:var(--shadow);
+  }
+  dialog::backdrop{background:rgba(20,15,10,0.5);backdrop-filter:blur(1px);}
+  .dlg-body{padding:22px 24px 24px;max-height:85vh;overflow-y:auto;}
+  .dlg-close{
+    position:absolute;top:14px;right:14px;
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    color:var(--ink-soft);padding:4px;
+  }
+  .dlg-close svg{width:18px;height:18px;display:block;}
+
+  /* detail dialog */
+  #detailDlg{border-left:6px solid var(--genre-color,var(--accent));}
+  .detail-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;}
+  .detail-cover{flex:none;width:84px;height:84px;}
+  .detail-cover img{
+    width:84px;height:84px;border-radius:14px;object-fit:cover;
+    border:1px solid var(--line);box-shadow:var(--shadow);display:block;
+  }
+  .detail-cover-placeholder{
+    width:84px;height:84px;border-radius:14px;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--genre-color,var(--accent));opacity:.55;
+  }
+  .detail-cover-placeholder svg{width:32px;height:32px;}
+  .detail-head-text{min-width:0;flex:1;}
+  .detail-genre{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+    color:var(--genre-color,var(--accent));
+  }
+  .detail-title{font-size:22px;font-weight:800;letter-spacing:-0.01em;margin:4px 0 2px;text-wrap:balance;}
+  .detail-artist{font-size:14px;color:var(--ink-soft);}
+  .detail-badges{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .detail-badge{
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:8px 12px;font-size:12px;color:var(--ink-soft);
+  }
+  .detail-badge b{display:block;font-size:16px;color:var(--ink);margin-top:1px;}
+  .link-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .link-btn{
+    appearance:none;cursor:pointer;font-family:inherit;
+    text-decoration:none;
+    display:inline-flex;align-items:center;gap:6px;
+    padding:9px 14px;border-radius:9px;font-size:13px;font-weight:600;
+    border:1px solid var(--line);color:var(--ink);background:var(--paper);
+  }
+  .link-btn:hover{background:var(--hover);}
+  .link-btn svg{width:14px;height:14px;}
+  .lyrics-block{
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;font-size:13.5px;line-height:1.85;
+    white-space:pre-wrap;color:var(--ink);
+    max-height:280px;overflow-y:auto;
+  }
+  .lyrics-empty{color:var(--ink-soft);font-size:13px;}
+  .section-label{
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;
+    color:var(--ink-soft);margin:0 0 8px;
+  }
+  .lyrics-header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    margin-bottom:8px;
+  }
+  .lyrics-header .section-label{margin:0;}
+  .lyrics-header .link-btn{padding:6px 11px;font-size:12px;}
+  .lyrics-header .link-btn svg{width:12px;height:12px;}
+  .detail-actions{display:flex;gap:8px;margin-top:18px;border-top:1px solid var(--line);padding-top:16px;justify-content:flex-end;}
+
+  /* form dialog */
+  form h2{font-size:19px;font-weight:800;margin:0 0 16px;letter-spacing:-0.01em;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:9px 11px;border-radius:8px;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);
+    font-family:inherit;font-size:13.5px;
+  }
+  .field textarea{resize:vertical;min-height:70px;font-family:inherit;line-height:1.6;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;}
+  .req{color:var(--accent);}
+
+  .image-field{display:flex;gap:12px;align-items:center;margin-bottom:8px;}
+  .image-preview{
+    flex:none;width:64px;height:64px;border-radius:10px;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    color:var(--ink-soft);
+  }
+  .image-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+  .image-preview svg{width:24px;height:24px;opacity:.5;}
+  .image-field-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .file-btn{cursor:pointer;font-size:13px;}
+  .btn-sm{padding:8px 12px;font-size:12.5px;}
+
+  /* playlist picker */
+  .pick-song-name{font-size:13px;color:var(--ink-soft);margin:-8px 0 16px;}
+  #pickList{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;margin-bottom:14px;}
+  .pick-empty{font-size:13px;color:var(--ink-soft);padding:8px 0;}
+  .pick-row{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--paper);
+    cursor:pointer;
+  }
+  .pick-row input[type="checkbox"]{
+    width:17px;height:17px;accent-color:var(--accent);flex:none;cursor:pointer;
+  }
+  .pick-row span.pick-name{flex:1;font-size:13.5px;font-weight:600;}
+  .pick-row span.pick-count{font-size:11.5px;color:var(--ink-soft);flex:none;}
+  .new-folder-row{display:flex;gap:8px;margin-bottom:4px;}
+  .new-folder-row input{
+    flex:1;padding:9px 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--paper);color:var(--ink);
+    font-family:inherit;font-size:13.5px;
+  }
+
+  footer{
+    max-width:1040px;margin:36px auto 0;padding:0 20px;
+    font-size:12px;color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title-row">
+      <div>
+        <h1>나의 노래책</h1>
+        <p class="subtitle">My Karaoke Songbook</p>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="searchInput" placeholder="곡명 또는 가수 검색" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tabs" role="tablist" id="tabs">
+        <button class="tab" data-filter="all" role="tab" aria-selected="true">전체 <span class="count" id="cnt-all"></span></button>
+        <button class="tab" data-filter="kpop" role="tab" aria-selected="false">K-POP <span class="count" id="cnt-kpop"></span></button>
+        <button class="tab" data-filter="jpop" role="tab" aria-selected="false">J-POP <span class="count" id="cnt-jpop"></span></button>
+        <button class="tab" data-filter="pop" role="tab" aria-selected="false">POP <span class="count" id="cnt-pop"></span></button>
+        <button class="tab" data-filter="fav" role="tab" aria-selected="false">★ 내 목록 <span class="count" id="cnt-fav"></span></button>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="addBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          노래 추가
+        </button>
+        <button class="icon-btn" id="themeToggle" aria-label="다크모드 전환" type="button"></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="playlist-header" id="playlistHeader" hidden></div>
+  <main class="grid" id="grid"><div class="empty">불러오는 중...</div></main>
+
+  <footer>TJ/금영 번호는 조사 시점 기준이며 매장·업데이트에 따라 다를 수 있어요. 노래 추가·수정·삭제는 공유 비밀번호가 필요하고, 저장하면 모두에게 보여요. 내 목록(폴더)은 이 브라우저에만 저장돼요.</footer>
+</div>
+
+<!-- detail dialog -->
+<dialog id="detailDlg">
+  <div class="dlg-body">
+    <button class="dlg-close" id="detailClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="detail-head">
+      <div class="detail-cover" id="dCoverWrap"></div>
+      <div class="detail-head-text">
+        <div class="detail-genre" id="dGenre"></div>
+        <div class="detail-title" id="dTitle"></div>
+        <div class="detail-artist" id="dArtist"></div>
+      </div>
+    </div>
+
+    <div class="detail-badges">
+      <div class="detail-badge">TJ<b id="dTj">-</b></div>
+      <div class="detail-badge">금영(KY)<b id="dKy">-</b></div>
+      <button class="btn btn-primary" id="dFavBtn" style="margin-left:auto;">즐겨찾기 추가</button>
+    </div>
+
+    <div class="link-row">
+      <a class="link-btn" id="dOriginalBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+        원곡
+      </a>
+      <a class="link-btn" id="dMrBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+        MR
+      </a>
+    </div>
+
+    <div class="lyrics-header">
+      <p class="section-label">가사</p>
+      <a class="link-btn" id="dLyricsLink" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M6 4h9l5 5v11H6z"/><path d="M15 4v5h5"/></svg>
+        가사 사이트
+      </a>
+    </div>
+    <div id="dLyricsBlock"></div>
+
+    <div class="detail-actions">
+      <button class="btn btn-ghost" id="dEditBtn">수정</button>
+      <button class="btn btn-ghost" id="dDeleteBtn">삭제</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- playlist picker dialog -->
+<dialog id="pickDlg">
+  <div class="dlg-body">
+    <button class="dlg-close" id="pickClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <h2>목록 추가</h2>
+    <p class="pick-song-name" id="pickSongName"></p>
+    <div id="pickList"></div>
+    <div class="new-folder-row">
+      <input type="text" id="pickNewFolderInput" placeholder="새 폴더 이름" maxlength="40">
+      <button type="button" class="btn btn-ghost btn-sm" id="pickNewFolderBtn">+ 만들기</button>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" id="pickDoneBtn">완료</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- folder create/settings dialog -->
+<dialog id="folderFormDlg">
+  <div class="dlg-body">
+    <button class="dlg-close" id="folderFormClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <form id="folderForm">
+      <h2 id="folderFormTitle">폴더 만들기</h2>
+      <input type="hidden" id="fFolderId">
+
+      <div class="field">
+        <label>폴더 이미지</label>
+        <div class="image-field">
+          <div class="image-preview" id="folderImgPreview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <div class="image-field-actions">
+            <label class="btn btn-ghost btn-sm file-btn" for="folderImageFile">파일 선택</label>
+            <input type="file" id="folderImageFile" accept="image/*" hidden>
+            <button type="button" class="btn btn-ghost btn-sm" id="folderImageClear">이미지 제거</button>
+          </div>
+        </div>
+        <input type="url" id="folderImageUrl" placeholder="또는 이미지 URL 붙여넣기">
+      </div>
+
+      <div class="field">
+        <label for="folderNameInput">폴더 이름 <span class="req">*</span></label>
+        <input type="text" id="folderNameInput" required maxlength="40" placeholder="예: 노래방 세트리스트">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="folderFormCancel">취소</button>
+        <button type="submit" class="btn btn-primary" id="folderFormSubmit">생성</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<!-- add/edit dialog -->
+<dialog id="formDlg">
+  <div class="dlg-body">
+    <button class="dlg-close" id="formClose" aria-label="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <form id="songForm">
+      <h2 id="formTitle">노래 추가</h2>
+      <input type="hidden" id="fId">
+
+      <div class="field">
+        <label for="fTitle">곡명 <span class="req">*</span></label>
+        <input type="text" id="fTitle" required>
+      </div>
+      <div class="field">
+        <label for="fArtist">가수 <span class="req">*</span></label>
+        <input type="text" id="fArtist" required>
+      </div>
+      <div class="field">
+        <label>앨범 이미지</label>
+        <div class="image-field">
+          <div class="image-preview" id="fImgPreview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </div>
+          <div class="image-field-actions">
+            <label class="btn btn-ghost btn-sm file-btn" for="fImageFile">파일 선택</label>
+            <input type="file" id="fImageFile" accept="image/*" hidden>
+            <button type="button" class="btn btn-ghost btn-sm" id="fImageClear">이미지 제거</button>
+          </div>
+        </div>
+        <input type="url" id="fImageUrl" placeholder="또는 이미지 URL 붙여넣기">
+      </div>
+      <div class="field">
+        <label for="fGenre">장르</label>
+        <select id="fGenre">
+          <option value="kpop">K-POP</option>
+          <option value="jpop">J-POP</option>
+          <option value="pop">POP</option>
+        </select>
+      </div>
+      <div class="field field-row">
+        <div>
+          <label for="fTj">TJ 번호</label>
+          <input type="text" id="fTj" placeholder="예: 12345">
+        </div>
+        <div>
+          <label for="fKy">금영(KY) 번호</label>
+          <input type="text" id="fKy" placeholder="예: 98765">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fMr">MR 유튜브 링크</label>
+        <input type="url" id="fMr" placeholder="https://youtube.com/...">
+      </div>
+      <div class="field">
+        <label for="fOriginal">원곡 유튜브 링크</label>
+        <input type="url" id="fOriginal" placeholder="https://youtube.com/...">
+      </div>
+      <div class="field">
+        <label for="fLyricsUrl">가사 사이트 링크</label>
+        <input type="url" id="fLyricsUrl" placeholder="https://...">
+      </div>
+      <div class="field">
+        <label for="fLyricsText">가사 직접 입력 (선택)</label>
+        <textarea id="fLyricsText" placeholder="가사를 붙여넣으면 사이트 안에서 바로 볼 수 있어요"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" id="formCancel">취소</button>
+        <button type="submit" class="btn btn-primary">저장</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+
+  var GENRE_LABEL = {kpop:"K-POP", jpop:"J-POP", pop:"POP"};
+  var GENRE_VAR = {kpop:"--tab-kpop", jpop:"--tab-jpop", pop:"--tab-pop"};
+
+  // ---- shared song data (server-backed) ----
+  var songs = [];
+
+  var EDIT_PW_KEY = "songbook_edit_pw";
+  function getSavedPassword(){ try{ return localStorage.getItem(EDIT_PW_KEY) || ""; }catch(e){ return ""; } }
+  function setSavedPassword(pw){ try{ localStorage.setItem(EDIT_PW_KEY, pw); }catch(e){} }
+
+  function apiRequest(method, body, isRetry){
+    var pw = getSavedPassword();
+    var payload = Object.assign({}, body || {}, {password: pw});
+    return fetch("/api/songs", {
+      method: method,
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if(res.status === 401 && !isRetry){
+        var entered = window.prompt("공유 비밀번호를 입력하세요");
+        if(entered === null){ var e = new Error("cancelled"); e.cancelled = true; throw e; }
+        setSavedPassword(entered);
+        return apiRequest(method, body, true);
+      }
+      return res.json().catch(function(){ return {}; }).then(function(data){
+        if(!res.ok){ throw new Error(data.error || ("요청 실패 (" + res.status + ")")); }
+        return data;
+      });
+    });
+  }
+
+  function loadSongsFromServer(){
+    return fetch("/api/songs").then(function(res){
+      if(!res.ok) throw new Error("불러오기 실패");
+      return res.json();
+    });
+  }
+
+  // ---- playlists (folders) - local to this browser only ----
+  var PLAYLISTS_KEY = "songbook_v1_playlists";
+  function loadPlaylists(){
+    try{
+      var raw = localStorage.getItem(PLAYLISTS_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return [];
+  }
+  function savePlaylists(){
+    try{ localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists)); }catch(e){}
+  }
+  var playlists = loadPlaylists();
+
+  var currentFilter = "all";
+  var currentQuery = "";
+  var currentFolderId = null;
+
+  function songPlaylists(id){
+    return playlists.filter(function(p){ return p.songIds.indexOf(id) > -1; });
+  }
+  function isFavorited(id){
+    return songPlaylists(id).length > 0;
+  }
+  function createPlaylist(name){
+    name = (name||"").trim();
+    if(!name) return null;
+    var p = { id: "pl-" + Date.now() + "-" + Math.random().toString(36).slice(2,7), name: name, songIds: [] };
+    playlists.push(p);
+    savePlaylists();
+    return p;
+  }
+  function deletePlaylist(id){
+    playlists = playlists.filter(function(p){ return p.id !== id; });
+    savePlaylists();
+  }
+
+  // ---- theme toggle ----
+  var THEME_KEY = "songbook_v1_theme";
+  var sunSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  var moonSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>';
+  var themeToggle = document.getElementById("themeToggle");
+
+  function effectiveTheme(){
+    var attr = document.documentElement.getAttribute("data-theme");
+    if(attr === "dark" || attr === "light") return attr;
+    return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+  function paintThemeToggle(){
+    themeToggle.innerHTML = effectiveTheme() === "dark" ? sunSvg : moonSvg;
+  }
+  try{
+    var storedTheme = localStorage.getItem(THEME_KEY);
+    if(storedTheme === "dark" || storedTheme === "light"){
+      document.documentElement.setAttribute("data-theme", storedTheme);
+    }
+  }catch(e){}
+  paintThemeToggle();
+  themeToggle.addEventListener("click", function(){
+    var next = effectiveTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+    paintThemeToggle();
+  });
+
+  function escapeHtml(str){
+    return String(str==null?"":str).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function currentFolder(){
+    return playlists.find(function(p){ return p.id === currentFolderId; }) || null;
+  }
+
+  function filteredSongs(){
+    var q = currentQuery.trim().toLowerCase();
+    var base;
+    if(currentFilter === "fav"){
+      var folder = currentFolder();
+      if(!folder) return [];
+      var byId = {};
+      songs.forEach(function(s){ byId[s.id] = s; });
+      base = folder.songIds.map(function(id){ return byId[id]; }).filter(Boolean);
+    } else {
+      base = songs.filter(function(s){
+        return currentFilter === "all" || s.genre === currentFilter;
+      });
+    }
+    return base.filter(function(s){
+      if(q && !((s.title||"").toLowerCase().indexOf(q) > -1 || (s.artist||"").toLowerCase().indexOf(q) > -1)) return false;
+      return true;
+    });
+  }
+
+  function updateCounts(){
+    document.getElementById("cnt-all").textContent = songs.length;
+    document.getElementById("cnt-kpop").textContent = songs.filter(function(s){return s.genre==="kpop";}).length;
+    document.getElementById("cnt-jpop").textContent = songs.filter(function(s){return s.genre==="jpop";}).length;
+    document.getElementById("cnt-pop").textContent = songs.filter(function(s){return s.genre==="pop";}).length;
+    document.getElementById("cnt-fav").textContent = songs.filter(function(s){return isFavorited(s.id);}).length;
+  }
+
+  function starSvg(filled){
+    return '<svg viewBox="0 0 24 24" fill="'+(filled?"currentColor":"none")+'" stroke="currentColor" stroke-width="2"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7-5.4-4.8 7.1-.7z"/></svg>';
+  }
+  function noteSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+  }
+  function dragSvg(){
+    return '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>';
+  }
+  function folderSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  }
+  function trashSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
+  }
+  function gearSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  }
+  function backSvg(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>';
+  }
+  function artHtml(s, cls){
+    if(s.imageUrl){
+      return '<img class="'+cls+'" src="'+escapeHtml(s.imageUrl)+'" alt="" loading="lazy">';
+    }
+    return '<span class="'+cls+'-placeholder" style="--genre-color:var('+(GENRE_VAR[s.genre]||"--line")+')">'+noteSvg()+'</span>';
+  }
+
+  function songRowHtml(s, i, draggableMode){
+    var genreColorVar = GENRE_VAR[s.genre] || "--line";
+    return (
+      '<button class="card" style="--genre-color:var('+genreColorVar+')" data-id="'+s.id+'"' +
+        (draggableMode ? ' draggable="true"' : '') + '>' +
+        (draggableMode ? '<span class="drag-handle" aria-hidden="true">'+dragSvg()+'</span><span class="play-num">'+(i+1)+'</span>' : '') +
+        artHtml(s, "card-art") +
+        '<div class="card-info"><div class="card-title">'+escapeHtml(s.title)+'</div>' +
+        '<div class="card-artist">'+escapeHtml(s.artist)+'</div></div>' +
+        '<div class="badges">' +
+          '<span class="badge">TJ <b class="mono">'+escapeHtml(s.tj||"-")+'</b></span>' +
+          '<span class="badge">KY <b class="mono">'+escapeHtml(s.ky||"-")+'</b></span>' +
+        '</div>' +
+        '<span class="fav-btn" data-fav-id="'+s.id+'" role="button" aria-pressed="'+(isFavorited(s.id)?"true":"false")+'" aria-label="목록 추가">'+starSvg(isFavorited(s.id))+'</span>' +
+      '</button>'
+    );
+  }
+
+  function renderFolderSearch(q){
+    var grid = document.getElementById("grid");
+    var header = document.getElementById("playlistHeader");
+    var idSet = {};
+    playlists.forEach(function(p){ p.songIds.forEach(function(id){ idSet[id] = true; }); });
+    var matches = songs.filter(function(s){
+      if(!idSet[s.id]) return false;
+      return (s.title||"").toLowerCase().indexOf(q) > -1 || (s.artist||"").toLowerCase().indexOf(q) > -1;
+    });
+    header.hidden = false;
+    header.innerHTML = '<h2>검색 결과</h2><p>내 목록에서 '+matches.length+'곡 찾음</p>';
+    if(matches.length === 0){
+      grid.innerHTML = '<div class="empty">내 목록에 저장된 곡 중 일치하는 노래가 없어요.</div>';
+      return;
+    }
+    grid.innerHTML = matches.map(function(s){ return songRowHtml(s, 0, false); }).join("");
+  }
+
+  function renderFolderList(){
+    var grid = document.getElementById("grid");
+    var header = document.getElementById("playlistHeader");
+    var q = currentQuery.trim().toLowerCase();
+    if(q){ renderFolderSearch(q); return; }
+
+    header.hidden = false;
+    header.innerHTML =
+      '<div><h2>내 폴더</h2><p>폴더를 만들어 부를 노래를 정리해보세요</p></div>' +
+      '<button type="button" class="btn btn-primary btn-sm" id="newFolderBtn">+ 폴더 만들기</button>';
+
+    if(playlists.length === 0){
+      grid.innerHTML = '<div class="empty">아직 만든 폴더가 없어요. 오른쪽 위에서 폴더를 하나 만들어보세요.</div>';
+      return;
+    }
+
+    grid.innerHTML = playlists.map(function(p){
+      return (
+        '<button class="folder-row" data-folder-id="'+p.id+'">' +
+          (p.imageUrl
+            ? '<img class="folder-icon-img" src="'+escapeHtml(p.imageUrl)+'" alt="">'
+            : '<span class="folder-icon">'+folderSvg()+'</span>') +
+          '<div class="folder-info"><div class="folder-name">'+escapeHtml(p.name)+'</div>' +
+          '<div class="folder-count">'+p.songIds.length+'곡</div></div>' +
+          '<span class="folder-settings" data-settings-folder="'+p.id+'" role="button" aria-label="폴더 설정">'+gearSvg()+'</span>' +
+          '<span class="folder-delete" data-delete-folder="'+p.id+'" role="button" aria-label="폴더 삭제">'+trashSvg()+'</span>' +
+        '</button>'
+      );
+    }).join("");
+  }
+
+  function renderFolderSongs(){
+    var grid = document.getElementById("grid");
+    var header = document.getElementById("playlistHeader");
+    var folder = currentFolder();
+    if(!folder){ currentFolderId = null; renderFolderList(); return; }
+    var list = filteredSongs();
+
+    header.hidden = false;
+    header.innerHTML =
+      '<div style="width:100%;">' +
+        '<button type="button" class="back-btn" id="folderBackBtn">'+backSvg()+' 폴더 목록</button>' +
+        '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+          '<h2>'+escapeHtml(folder.name)+'</h2>' +
+          '<p>'+folder.songIds.length+'곡 · 드래그해서 순서를 바꿔보세요</p>' +
+        '</div>' +
+      '</div>';
+
+    if(list.length === 0){
+      grid.innerHTML = '<div class="empty">이 폴더에 담긴 노래가 없어요. 노래의 ★ 버튼에서 이 폴더를 선택해보세요.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(s, i){ return songRowHtml(s, i, true); }).join("");
+  }
+
+  function render(){
+    updateCounts();
+    var grid = document.getElementById("grid");
+    var header = document.getElementById("playlistHeader");
+
+    if(currentFilter === "fav"){
+      if(currentFolderId){ renderFolderSongs(); }
+      else { renderFolderList(); }
+      return;
+    }
+
+    header.hidden = true;
+    header.innerHTML = "";
+    var list = filteredSongs();
+    if(list.length === 0){
+      grid.innerHTML = '<div class="empty">해당하는 노래가 없어요.</div>';
+      return;
+    }
+    grid.innerHTML = list.map(function(s){ return songRowHtml(s, 0, false); }).join("");
+  }
+
+  // ---- playlist picker dialog ----
+  var pickDlg = document.getElementById("pickDlg");
+  var pickList = document.getElementById("pickList");
+  var pickNewFolderInput = document.getElementById("pickNewFolderInput");
+  var pickSongId = null;
+
+  function refreshFavStars(){
+    document.querySelectorAll("[data-fav-id]").forEach(function(el){
+      var fav = isFavorited(el.getAttribute("data-fav-id"));
+      el.setAttribute("aria-pressed", fav ? "true" : "false");
+      el.innerHTML = starSvg(fav);
+    });
+    var favCount = document.getElementById("cnt-fav");
+    if(favCount) favCount.textContent = songs.filter(function(s){return isFavorited(s.id);}).length;
+    if(currentDetailSong) updateFavBtnLabel(currentDetailSong.id);
+  }
+
+  function renderPickList(){
+    if(playlists.length === 0){
+      pickList.innerHTML = '<p class="pick-empty">아직 폴더가 없어요. 아래에서 새로 만들어보세요.</p>';
+      return;
+    }
+    pickList.innerHTML = playlists.map(function(p){
+      var checked = p.songIds.indexOf(pickSongId) > -1;
+      return (
+        '<label class="pick-row">' +
+          '<input type="checkbox" data-playlist-id="'+p.id+'"'+(checked?" checked":"")+'>' +
+          '<span class="pick-name">'+escapeHtml(p.name)+'</span>' +
+          '<span class="pick-count">'+p.songIds.length+'곡</span>' +
+        '</label>'
+      );
+    }).join("");
+  }
+
+  function openPicker(songId){
+    pickSongId = songId;
+    var s = songs.find(function(x){return x.id===songId;});
+    document.getElementById("pickSongName").textContent = s ? (s.title + " · " + s.artist) : "";
+    pickNewFolderInput.value = "";
+    renderPickList();
+    pickDlg.showModal();
+  }
+
+  pickList.addEventListener("change", function(e){
+    var cb = e.target.closest("input[data-playlist-id]");
+    if(!cb || !pickSongId) return;
+    var p = playlists.find(function(x){return x.id===cb.getAttribute("data-playlist-id");});
+    if(!p) return;
+    if(cb.checked){
+      if(p.songIds.indexOf(pickSongId) === -1) p.songIds.push(pickSongId);
+    } else {
+      p.songIds = p.songIds.filter(function(id){return id!==pickSongId;});
+    }
+    savePlaylists();
+    renderPickList();
+    refreshFavStars();
+  });
+
+  document.getElementById("pickNewFolderBtn").addEventListener("click", function(){
+    var p = createPlaylist(pickNewFolderInput.value);
+    if(!p) return;
+    pickNewFolderInput.value = "";
+    if(pickSongId){
+      p.songIds.push(pickSongId);
+      savePlaylists();
+    }
+    renderPickList();
+    refreshFavStars();
+  });
+  pickNewFolderInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); document.getElementById("pickNewFolderBtn").click(); }
+  });
+
+  document.getElementById("pickClose").addEventListener("click", function(){ pickDlg.close(); render(); });
+  document.getElementById("pickDoneBtn").addEventListener("click", function(){ pickDlg.close(); render(); });
+
+  // ---- folder create/settings dialog (local only) ----
+  var folderFormDlg = document.getElementById("folderFormDlg");
+  var folderForm = document.getElementById("folderForm");
+  var folderImgPreview = document.getElementById("folderImgPreview");
+  var folderImageFile = document.getElementById("folderImageFile");
+  var folderImageUrl = document.getElementById("folderImageUrl");
+  var currentFolderImageValue = "";
+
+  function setFolderImagePreview(value){
+    currentFolderImageValue = value || "";
+    folderImgPreview.innerHTML = currentFolderImageValue
+      ? '<img src="'+escapeHtml(currentFolderImageValue)+'" alt="">'
+      : folderSvg();
+  }
+  folderImageUrl.addEventListener("input", function(){ setFolderImagePreview(folderImageUrl.value.trim()); });
+  folderImageFile.addEventListener("change", function(){
+    var file = folderImageFile.files && folderImageFile.files[0];
+    if(!file) return;
+    resizeImageFile(file, 500, function(dataUrl){
+      folderImageUrl.value = "";
+      setFolderImagePreview(dataUrl);
+    });
+  });
+  document.getElementById("folderImageClear").addEventListener("click", function(){
+    folderImageFile.value = "";
+    folderImageUrl.value = "";
+    setFolderImagePreview("");
+  });
+
+  function openFolderForm(editId){
+    folderForm.reset();
+    document.getElementById("fFolderId").value = editId || "";
+    if(editId){
+      var p = playlists.find(function(x){return x.id===editId;});
+      if(!p) return;
+      document.getElementById("folderFormTitle").textContent = "폴더 설정";
+      document.getElementById("folderFormSubmit").textContent = "저장";
+      document.getElementById("folderNameInput").value = p.name || "";
+      folderImageUrl.value = (p.imageUrl && p.imageUrl.indexOf("data:") !== 0) ? p.imageUrl : "";
+      setFolderImagePreview(p.imageUrl || "");
+    } else {
+      document.getElementById("folderFormTitle").textContent = "폴더 만들기";
+      document.getElementById("folderFormSubmit").textContent = "생성";
+      setFolderImagePreview("");
+    }
+    folderFormDlg.showModal();
+  }
+
+  document.getElementById("folderFormClose").addEventListener("click", function(){ folderFormDlg.close(); });
+  document.getElementById("folderFormCancel").addEventListener("click", function(){ folderFormDlg.close(); });
+
+  folderForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var editId = document.getElementById("fFolderId").value;
+    var name = document.getElementById("folderNameInput").value.trim();
+    if(!name) return;
+    if(editId){
+      var p = playlists.find(function(x){return x.id===editId;});
+      if(p){ p.name = name; p.imageUrl = currentFolderImageValue; savePlaylists(); }
+    } else {
+      var np = createPlaylist(name);
+      if(np){ np.imageUrl = currentFolderImageValue; savePlaylists(); }
+    }
+    folderFormDlg.close();
+    render();
+  });
+
+  // ---- tabs & search ----
+  document.getElementById("tabs").addEventListener("click", function(e){
+    var btn = e.target.closest(".tab");
+    if(!btn) return;
+    currentFilter = btn.getAttribute("data-filter");
+    currentFolderId = null;
+    document.querySelectorAll(".tab").forEach(function(t){ t.setAttribute("aria-selected", t===btn ? "true":"false"); });
+    render();
+  });
+  document.getElementById("searchInput").addEventListener("input", function(e){
+    currentQuery = e.target.value;
+    render();
+  });
+
+  // ---- grid interactions (song list / folder list) ----
+  document.getElementById("grid").addEventListener("click", function(e){
+    var settingsFolder = e.target.closest("[data-settings-folder]");
+    if(settingsFolder){
+      e.stopPropagation();
+      openFolderForm(settingsFolder.getAttribute("data-settings-folder"));
+      return;
+    }
+    var delFolder = e.target.closest("[data-delete-folder]");
+    if(delFolder){
+      e.stopPropagation();
+      var pl = playlists.find(function(x){return x.id===delFolder.getAttribute("data-delete-folder");});
+      if(pl && confirm('"'+pl.name+'" 폴더를 삭제할까요? (노래 자체는 삭제되지 않아요)')){
+        deletePlaylist(pl.id);
+        render();
+      }
+      return;
+    }
+    var folderRow = e.target.closest("[data-folder-id]");
+    if(folderRow){
+      currentFolderId = folderRow.getAttribute("data-folder-id");
+      render();
+      return;
+    }
+    var favEl = e.target.closest("[data-fav-id]");
+    if(favEl){
+      e.stopPropagation();
+      openPicker(favEl.getAttribute("data-fav-id"));
+      return;
+    }
+    var card = e.target.closest(".card[data-id]");
+    if(card){ openDetail(card.getAttribute("data-id")); }
+  });
+  document.getElementById("playlistHeader").addEventListener("click", function(e){
+    var backBtn = e.target.closest("#folderBackBtn");
+    if(backBtn){
+      currentFolderId = null;
+      render();
+      return;
+    }
+    var newFolderBtn = e.target.closest("#newFolderBtn");
+    if(newFolderBtn){
+      openFolderForm(null);
+    }
+  });
+
+  // ---- playlist drag reorder (within an open folder, local only) ----
+  var dragId = null;
+  document.getElementById("grid").addEventListener("dragstart", function(e){
+    var card = e.target.closest(".card[draggable='true']");
+    if(!card) return;
+    dragId = card.getAttribute("data-id");
+    e.dataTransfer.effectAllowed = "move";
+    try{ e.dataTransfer.setData("text/plain", dragId); }catch(err){}
+  });
+  document.getElementById("grid").addEventListener("dragover", function(e){
+    var card = e.target.closest(".card[draggable='true']");
+    if(!card || !dragId) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
+    if(card.getAttribute("data-id") !== dragId) card.classList.add("drag-over");
+  });
+  document.getElementById("grid").addEventListener("dragleave", function(e){
+    var card = e.target.closest(".card");
+    if(card) card.classList.remove("drag-over");
+  });
+  document.getElementById("grid").addEventListener("drop", function(e){
+    var card = e.target.closest(".card[draggable='true']");
+    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
+    if(!card || !dragId) return;
+    e.preventDefault();
+    var overId = card.getAttribute("data-id");
+    if(overId === dragId) return;
+    var folder = currentFolder();
+    if(!folder) return;
+    var from = folder.songIds.indexOf(dragId);
+    var to = folder.songIds.indexOf(overId);
+    if(from === -1 || to === -1) return;
+    folder.songIds.splice(from, 1);
+    folder.songIds.splice(to, 0, dragId);
+    savePlaylists();
+    render();
+  });
+  document.getElementById("grid").addEventListener("dragend", function(){
+    dragId = null;
+    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
+  });
+
+  // ---- detail dialog ----
+  var detailDlg = document.getElementById("detailDlg");
+  document.getElementById("detailClose").addEventListener("click", function(){ detailDlg.close(); });
+
+  var dMrBtn = document.getElementById("dMrBtn");
+  var dOriginalBtn = document.getElementById("dOriginalBtn");
+  var currentDetailSong = null;
+
+  function fillDetail(s){
+    currentDetailSong = s;
+    detailDlg.dataset.id = s.id;
+    detailDlg.style.setProperty("--genre-color", "var(" + (GENRE_VAR[s.genre]||"--line") + ")");
+    document.getElementById("dCoverWrap").innerHTML = s.imageUrl
+      ? '<img src="'+escapeHtml(s.imageUrl)+'" alt="">'
+      : '<span class="detail-cover-placeholder" style="--genre-color:var('+(GENRE_VAR[s.genre]||"--line")+')">'+noteSvg()+'</span>';
+    document.getElementById("dGenre").textContent = GENRE_LABEL[s.genre] || s.genre;
+    document.getElementById("dTitle").textContent = s.title;
+    document.getElementById("dArtist").textContent = s.artist;
+    document.getElementById("dTj").textContent = s.tj || "-";
+    document.getElementById("dKy").textContent = s.ky || "-";
+
+    if(s.mrUrl){ dMrBtn.href = s.mrUrl; dMrBtn.style.display = "inline-flex"; }
+    else { dMrBtn.style.display = "none"; }
+    if(s.originalUrl){ dOriginalBtn.href = s.originalUrl; dOriginalBtn.style.display = "inline-flex"; }
+    else { dOriginalBtn.style.display = "none"; }
+
+    var dLyricsLink = document.getElementById("dLyricsLink");
+    if(s.lyricsUrl){ dLyricsLink.href = s.lyricsUrl; dLyricsLink.style.display = "inline-flex"; }
+    else { dLyricsLink.style.display = "none"; }
+
+    var lyricsBlock = document.getElementById("dLyricsBlock");
+    if(s.lyricsText && s.lyricsText.trim()){
+      lyricsBlock.innerHTML = '<div class="lyrics-block">'+escapeHtml(s.lyricsText)+'</div>';
+    } else {
+      lyricsBlock.innerHTML = '<p class="lyrics-empty">아직 입력된 가사가 없어요. "수정"에서 가사를 직접 추가하거나 가사 사이트 링크를 확인하세요.</p>';
+    }
+
+    updateFavBtnLabel(s.id);
+  }
+
+  function updateFavBtnLabel(id){
+    var favBtn = document.getElementById("dFavBtn");
+    favBtn.textContent = isFavorited(id) ? "★ 목록 관리" : "☆ 목록 추가";
+  }
+
+  function openDetail(id){
+    var s = songs.find(function(x){return x.id===id;});
+    if(!s) return;
+    fillDetail(s);
+    detailDlg.showModal();
+  }
+
+  document.getElementById("dFavBtn").addEventListener("click", function(){
+    openPicker(detailDlg.dataset.id);
+  });
+  document.getElementById("dDeleteBtn").addEventListener("click", function(){
+    var id = detailDlg.dataset.id;
+    var s = songs.find(function(x){return x.id===id;});
+    if(!s) return;
+    if(!confirm('"'+s.title+'"을(를) 노래책에서 삭제할까요? (모두에게 삭제돼요)')) return;
+    var deleteBtn = document.getElementById("dDeleteBtn");
+    deleteBtn.disabled = true;
+    apiRequest("DELETE", {id: id}).then(function(){
+      songs = songs.filter(function(x){return x.id!==id;});
+      playlists.forEach(function(p){ p.songIds = p.songIds.filter(function(x){return x!==id;}); });
+      savePlaylists();
+      detailDlg.close();
+      render();
+    }).catch(function(err){
+      if(!err.cancelled) alert(err.message);
+    }).finally(function(){
+      deleteBtn.disabled = false;
+    });
+  });
+  document.getElementById("dEditBtn").addEventListener("click", function(){
+    var id = detailDlg.dataset.id;
+    detailDlg.close();
+    openForm(id);
+  });
+
+  // ---- add/edit form dialog ----
+  var formDlg = document.getElementById("formDlg");
+  var songForm = document.getElementById("songForm");
+  var fImgPreview = document.getElementById("fImgPreview");
+  var fImageFile = document.getElementById("fImageFile");
+  var fImageUrl = document.getElementById("fImageUrl");
+  var currentImageValue = "";
+
+  function setImagePreview(value){
+    currentImageValue = value || "";
+    fImgPreview.innerHTML = currentImageValue
+      ? '<img src="'+escapeHtml(currentImageValue)+'" alt="">'
+      : noteSvg();
+  }
+
+  // downscale to keep base64 uploads a reasonable size
+  function resizeImageFile(file, maxDim, callback){
+    var reader = new FileReader();
+    reader.onload = function(){
+      var img = new Image();
+      img.onload = function(){
+        var scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        var w = Math.round(img.width * scale);
+        var h = Math.round(img.height * scale);
+        var canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  fImageUrl.addEventListener("input", function(){ setImagePreview(fImageUrl.value.trim()); });
+  fImageFile.addEventListener("change", function(){
+    var file = fImageFile.files && fImageFile.files[0];
+    if(!file) return;
+    resizeImageFile(file, 500, function(dataUrl){
+      fImageUrl.value = "";
+      setImagePreview(dataUrl);
+    });
+  });
+  document.getElementById("fImageClear").addEventListener("click", function(){
+    fImageFile.value = "";
+    fImageUrl.value = "";
+    setImagePreview("");
+  });
+
+  function openForm(editId){
+    songForm.reset();
+    document.getElementById("fId").value = editId || "";
+    if(editId){
+      var s = songs.find(function(x){return x.id===editId;});
+      document.getElementById("formTitle").textContent = "노래 수정";
+      document.getElementById("fTitle").value = s.title || "";
+      document.getElementById("fArtist").value = s.artist || "";
+      document.getElementById("fGenre").value = s.genre || "kpop";
+      document.getElementById("fTj").value = s.tj || "";
+      document.getElementById("fKy").value = s.ky || "";
+      document.getElementById("fMr").value = s.mrUrl || "";
+      document.getElementById("fOriginal").value = s.originalUrl || "";
+      document.getElementById("fLyricsUrl").value = s.lyricsUrl || "";
+      document.getElementById("fLyricsText").value = s.lyricsText || "";
+      fImageUrl.value = (s.imageUrl && s.imageUrl.indexOf("data:") !== 0) ? s.imageUrl : "";
+      setImagePreview(s.imageUrl || "");
+    } else {
+      document.getElementById("formTitle").textContent = "노래 추가";
+      setImagePreview("");
+    }
+    formDlg.showModal();
+  }
+
+  document.getElementById("addBtn").addEventListener("click", function(){ openForm(null); });
+  document.getElementById("formClose").addEventListener("click", function(){ formDlg.close(); });
+  document.getElementById("formCancel").addEventListener("click", function(){ formDlg.close(); });
+
+  songForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var id = document.getElementById("fId").value;
+    var data = {
+      title: document.getElementById("fTitle").value.trim(),
+      artist: document.getElementById("fArtist").value.trim(),
+      genre: document.getElementById("fGenre").value,
+      tj: document.getElementById("fTj").value.trim(),
+      ky: document.getElementById("fKy").value.trim(),
+      mrUrl: document.getElementById("fMr").value.trim(),
+      originalUrl: document.getElementById("fOriginal").value.trim(),
+      lyricsUrl: document.getElementById("fLyricsUrl").value.trim(),
+      lyricsText: document.getElementById("fLyricsText").value,
+      imageUrl: currentImageValue
+    };
+    if(!data.title || !data.artist) return;
+
+    var submitBtn = songForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    var req;
+    if(id){
+      data.id = id;
+      req = apiRequest("PUT", data).then(function(saved){
+        var idx = songs.findIndex(function(x){return x.id===id;});
+        if(idx > -1) songs[idx] = saved;
+      });
+    } else {
+      req = apiRequest("POST", data).then(function(created){
+        songs.push(created);
+      });
+    }
+
+    req.then(function(){
+      formDlg.close();
+      render();
+    }).catch(function(err){
+      if(!err.cancelled) alert(err.message);
+    }).finally(function(){
+      submitBtn.disabled = false;
+    });
+  });
+
+  // ---- initial load ----
+  loadSongsFromServer().then(function(data){
+    songs = data;
+    render();
+  }).catch(function(){
+    document.getElementById("grid").innerHTML = '<div class="empty">노래 목록을 불러오지 못했어요. 새로고침해보세요.</div>';
+  });
+})();
+</script>
+</body>
+</html>
