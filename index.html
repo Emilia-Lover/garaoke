@@ -310,18 +310,6 @@
     white-space:nowrap;
   }
   .badge b{color:var(--ink);font-weight:700;}
-  @media (max-width:560px){
-    .badges{display:none;}
-    /* bigger touch targets on phones */
-    .fav-btn{padding:9px;}
-    .drag-handle{padding:8px 5px;}
-    .folder-settings,.folder-delete{padding:9px;}
-    .dlg-close{padding:9px;}
-    .icon-btn{width:42px;height:42px;}
-    .field-row{grid-template-columns:1fr;}
-    .detail-badges .btn{flex:1 1 100%;justify-content:center;}
-    .link-row .link-btn{flex:1 1 auto;justify-content:center;}
-  }
 
   /* dialogs */
   dialog{
@@ -450,6 +438,19 @@
   footer{
     max-width:1040px;margin:36px auto 0;padding:0 20px;
     font-size:12px;color:var(--ink-soft);
+  }
+
+  /* mobile: placed last so these overrides win over the base rules above */
+  @media (max-width:560px){
+    .badges{display:none;}
+    .fav-btn{padding:9px;}
+    .drag-handle{padding:8px 5px;}
+    .folder-settings,.folder-delete{padding:9px;}
+    .dlg-close{padding:9px;}
+    .icon-btn{width:42px;height:42px;}
+    .field-row{grid-template-columns:1fr;}
+    .detail-badges .btn{flex:1 1 100%;justify-content:center;}
+    .link-row .link-btn{flex:1 1 auto;justify-content:center;}
   }
 </style>
 </head>
