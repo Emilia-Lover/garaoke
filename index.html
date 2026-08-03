@@ -258,7 +258,6 @@
     width:100%;
   }
   .card:hover{transform:translateY(-1px);}
-  .card[draggable="true"]{cursor:default;}
   .card.drag-over{outline:2px dashed var(--accent);outline-offset:-2px;}
   .drag-handle{
     flex:none;color:var(--ink-soft);opacity:.55;cursor:grab;
@@ -313,6 +312,15 @@
   .badge b{color:var(--ink);font-weight:700;}
   @media (max-width:560px){
     .badges{display:none;}
+    /* bigger touch targets on phones */
+    .fav-btn{padding:9px;}
+    .drag-handle{padding:8px 5px;}
+    .folder-settings,.folder-delete{padding:9px;}
+    .dlg-close{padding:9px;}
+    .icon-btn{width:42px;height:42px;}
+    .field-row{grid-template-columns:1fr;}
+    .detail-badges .btn{flex:1 1 100%;justify-content:center;}
+    .link-row .link-btn{flex:1 1 auto;justify-content:center;}
   }
 
   /* dialogs */
@@ -891,8 +899,7 @@
   function songRowHtml(s, i, draggableMode){
     var genreColorVar = GENRE_VAR[s.genre] || "--line";
     return (
-      '<button class="card" style="--genre-color:var('+genreColorVar+')" data-id="'+s.id+'"' +
-        (draggableMode ? ' draggable="true"' : '') + '>' +
+      '<button class="card" style="--genre-color:var('+genreColorVar+')" data-id="'+s.id+'">' +
         (draggableMode ? '<span class="drag-handle" aria-hidden="true">'+dragSvg()+'</span><span class="play-num">'+(i+1)+'</span>' : '') +
         artHtml(s, "card-art") +
         '<div class="card-info"><div class="card-title">'+escapeHtml(s.title)+'</div>' +
@@ -1204,47 +1211,53 @@
   });
 
   // ---- playlist drag reorder (within an open folder, local only) ----
-  var dragId = null;
-  document.getElementById("grid").addEventListener("dragstart", function(e){
-    var card = e.target.closest(".card[draggable='true']");
+  // uses Pointer Events (not native HTML5 drag-and-drop) so it works with touch on mobile too
+  var ptrDrag = null; // {id}
+  var gridEl = document.getElementById("grid");
+
+  function clearDragOver(){
+    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
+  }
+
+  gridEl.addEventListener("pointerdown", function(e){
+    var handle = e.target.closest(".drag-handle");
+    if(!handle) return;
+    var card = handle.closest(".card[data-id]");
     if(!card) return;
-    dragId = card.getAttribute("data-id");
-    e.dataTransfer.effectAllowed = "move";
-    try{ e.dataTransfer.setData("text/plain", dragId); }catch(err){}
-  });
-  document.getElementById("grid").addEventListener("dragover", function(e){
-    var card = e.target.closest(".card[draggable='true']");
-    if(!card || !dragId) return;
+    ptrDrag = { id: card.getAttribute("data-id"), overId: null };
+    try{ handle.setPointerCapture(e.pointerId); }catch(err){}
     e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
-    if(card.getAttribute("data-id") !== dragId) card.classList.add("drag-over");
   });
-  document.getElementById("grid").addEventListener("dragleave", function(e){
-    var card = e.target.closest(".card");
-    if(card) card.classList.remove("drag-over");
+  gridEl.addEventListener("pointermove", function(e){
+    if(!ptrDrag) return;
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    var card = el && el.closest && el.closest(".card[data-id]");
+    clearDragOver();
+    if(card && card.getAttribute("data-id") !== ptrDrag.id){
+      ptrDrag.overId = card.getAttribute("data-id");
+      card.classList.add("drag-over");
+    } else {
+      ptrDrag.overId = null;
+    }
   });
-  document.getElementById("grid").addEventListener("drop", function(e){
-    var card = e.target.closest(".card[draggable='true']");
-    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
-    if(!card || !dragId) return;
-    e.preventDefault();
-    var overId = card.getAttribute("data-id");
-    if(overId === dragId) return;
+  function finishPointerDrag(){
+    if(!ptrDrag) return;
+    clearDragOver();
     var folder = currentFolder();
-    if(!folder) return;
-    var from = folder.songIds.indexOf(dragId);
-    var to = folder.songIds.indexOf(overId);
-    if(from === -1 || to === -1) return;
-    folder.songIds.splice(from, 1);
-    folder.songIds.splice(to, 0, dragId);
-    savePlaylists();
-    render();
-  });
-  document.getElementById("grid").addEventListener("dragend", function(){
-    dragId = null;
-    document.querySelectorAll(".card.drag-over").forEach(function(c){ c.classList.remove("drag-over"); });
-  });
+    if(folder && ptrDrag.overId && ptrDrag.overId !== ptrDrag.id){
+      var from = folder.songIds.indexOf(ptrDrag.id);
+      var to = folder.songIds.indexOf(ptrDrag.overId);
+      if(from > -1 && to > -1){
+        folder.songIds.splice(from, 1);
+        folder.songIds.splice(to, 0, ptrDrag.id);
+        savePlaylists();
+        render();
+      }
+    }
+    ptrDrag = null;
+  }
+  gridEl.addEventListener("pointerup", finishPointerDrag);
+  gridEl.addEventListener("pointercancel", function(){ ptrDrag = null; clearDragOver(); });
 
   // ---- detail dialog ----
   var detailDlg = document.getElementById("detailDlg");
